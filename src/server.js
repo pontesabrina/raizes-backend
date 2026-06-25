@@ -281,6 +281,35 @@ app.post("/pagamentos/mock", async (req, res) => {
   }
 });
 
+app.get("/pedidos", async (req, res) => {
+  try {
+    const pedidos = await prisma.pedido.findMany({
+      include: {
+        itens: {
+          include: {
+            produto: true
+          }
+        },
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+            role: true
+          }
+        }
+      }
+    });
+
+    return res.json(pedidos);
+  } catch (error) {
+    return res.status(500).json({
+      error: "ERRO_INTERNO",
+      message: "Erro ao listar pedidos."
+    });
+  }
+});
+
 app.patch("/pedidos/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
